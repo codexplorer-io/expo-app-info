@@ -19,7 +19,7 @@ jest.mock('uuid', () => {
     return {
         v4: () => {
             uuid += 1;
-            return `uuid-${uuid.toString()}`;
+            return `uuid-${uuid}`;
         },
         reset: () => {
             uuid = 0;
