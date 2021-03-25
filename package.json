@@ -1,0 +1,15 @@
+{
+  "name": "@codexporer.io/expo-app-info",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "peerDependencies": {
+    "react": "*",
+    "react-dom": "*",
+    "react-sweet-state": "*",
+    "expo-constants": "*",
+    "expo-secure-store": "*",
+    "uuid": "*",
+    "lodash": "*",
+    "@codexporer.io/react-test-utils": "*"
+  }
+}
