@@ -36,7 +36,7 @@ export const Store = createStore({
             const installationId = await getInstallationId();
             setState({
                 appName: Constants.manifest?.name,
-                appVersion: Constants.nativeAppVersion,
+                appVersion: Constants.manifest?.version,
                 installationId,
                 sessionId,
                 appContainer: Constants.appOwnership === AppOwnership.Expo ? APP_CONTAINER.expo :

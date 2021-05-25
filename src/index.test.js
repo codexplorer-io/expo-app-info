@@ -30,9 +30,9 @@ jest.mock('uuid', () => {
 jest.mock('expo-constants', () => ({
     ...jest.requireActual('expo-constants'),
     manifest: {
-        name: 'mockAppName'
-    },
-    nativeAppVersion: 'mockAppVersion'
+        name: 'mockAppName',
+        version: 'mockAppVersion'
+    }
 }));
 
 jest.mock('expo-secure-store', () => {
