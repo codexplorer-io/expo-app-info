@@ -20,7 +20,8 @@ const getInstallationId = async () => {
 
 export const APP_CONTAINER = {
     expo: 'expo',
-    native: 'native'
+    native: 'native',
+    web: 'web'
 };
 
 export const Store = createStore({
@@ -32,18 +33,20 @@ export const Store = createStore({
         appContainer: undefined
     },
     actions: {
-        initialize: () => async ({ setState }) => {
+        initialize: ({ appContainer } = {}) => async ({ setState }) => {
             const installationId = await getInstallationId();
             setState({
                 appName: Constants.manifest?.name,
                 appVersion: Constants.manifest?.version,
                 installationId,
                 sessionId,
-                appContainer: Constants.appOwnership === AppOwnership.Expo ? APP_CONTAINER.expo :
-                    (
-                        Constants.appOwnership === AppOwnership.Standalone ||
+                appContainer: appContainer ?? (
+                    Constants.appOwnership === AppOwnership.Expo ? APP_CONTAINER.expo :
+                        (
+                            Constants.appOwnership === AppOwnership.Standalone ||
                         Constants.appOwnership === AppOwnership.Guest
-                    ) ? APP_CONTAINER.native : null
+                        ) ? APP_CONTAINER.native : null
+                )
             });
         }
     },

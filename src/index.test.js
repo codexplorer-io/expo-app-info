@@ -118,6 +118,23 @@ describe('App info', () => {
             ).toBe('uuid-1');
         });
 
+        it('should initialize with appContainer passed as an argument', async () => {
+            const {
+                HookRenderer,
+                hookResult
+            } = createHookRenderer(useAppInfo);
+
+            mountWithDi(<HookRenderer />);
+
+            await act(() => hookResult.actions.initialize({ appContainer: 'mockAppContainer' }));
+
+            expect(hookResult.state).toEqual(
+                expect.objectContaining({
+                    appContainer: 'mockAppContainer'
+                })
+            );
+        });
+
         it('should not change when initialize is called multiple times', async () => {
             const {
                 HookRenderer,
