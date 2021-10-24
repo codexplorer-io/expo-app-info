@@ -7,7 +7,12 @@ const sessionId = uuid();
 
 const getInstallationId = async () => {
     const key = 'codexporer.io-expo_app_info-installation_id';
-    let installationId = await SecureStore.getItemAsync(key);
+    let installationId;
+    try {
+        installationId = await SecureStore.getItemAsync(key);
+    } catch {
+        installationId = null;
+    }
     if (!installationId) {
         installationId = uuid();
         await SecureStore.setItemAsync(key, installationId, {
@@ -44,7 +49,7 @@ export const Store = createStore({
                     Constants.appOwnership === AppOwnership.Expo ? APP_CONTAINER.expo :
                         (
                             Constants.appOwnership === AppOwnership.Standalone ||
-                        Constants.appOwnership === AppOwnership.Guest
+                            Constants.appOwnership === AppOwnership.Guest
                         ) ? APP_CONTAINER.native : null
                 )
             });
