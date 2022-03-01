@@ -35,6 +35,10 @@ jest.mock('expo-constants', () => ({
     }
 }));
 
+jest.mock('expo-application', () => ({
+    getInstallationTimeAsync: () => Promise.resolve('mockInstalationTime')
+}));
+
 jest.mock('expo-secure-store', () => {
     let data = {};
 
@@ -110,6 +114,7 @@ describe('App info', () => {
                 appContainer: 'expo',
                 appName: 'mockAppName',
                 appVersion: 'mockAppVersion',
+                installationTime: 'mockInstalationTime',
                 installationId: 'uuid-1',
                 sessionId: 'uuid-0'
             });
@@ -151,6 +156,7 @@ describe('App info', () => {
                 appContainer: 'expo',
                 appName: 'mockAppName',
                 appVersion: 'mockAppVersion',
+                installationTime: 'mockInstalationTime',
                 installationId: 'uuid-1',
                 sessionId: 'uuid-0'
             });

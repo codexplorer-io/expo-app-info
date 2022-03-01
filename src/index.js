@@ -1,5 +1,6 @@
 import { createStore, createHook } from 'react-sweet-state';
 import Constants, { AppOwnership } from 'expo-constants';
+import * as Application from 'expo-application';
 import * as SecureStore from 'expo-secure-store';
 import { v4 as uuid } from 'uuid';
 
@@ -33,6 +34,7 @@ export const Store = createStore({
     initialState: {
         appName: undefined,
         appVersion: undefined,
+        installationTime: undefined,
         installationId: undefined,
         sessionId: undefined,
         appContainer: undefined
@@ -43,6 +45,7 @@ export const Store = createStore({
             setState({
                 appName: Constants.manifest?.name,
                 appVersion: Constants.manifest?.version,
+                installationTime: await Application.getInstallationTimeAsync(),
                 installationId,
                 sessionId,
                 appContainer: appContainer ?? (
