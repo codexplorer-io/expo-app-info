@@ -49,11 +49,9 @@ export const Store = createStore({
                 installationId,
                 sessionId,
                 appContainer: appContainer ?? (
-                    Constants.appOwnership === AppOwnership.Expo ? APP_CONTAINER.expo :
-                        (
-                            Constants.appOwnership === AppOwnership.Standalone ||
-                            Constants.appOwnership === AppOwnership.Guest
-                        ) ? APP_CONTAINER.native : null
+                    Constants.appOwnership === AppOwnership.Expo ?
+                        APP_CONTAINER.expo :
+                        APP_CONTAINER.native
                 )
             });
         }

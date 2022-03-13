@@ -164,7 +164,7 @@ describe('App info', () => {
 
         it.each`
             appOwnership               | appContainer
-            ${undefined}               | ${null}
+            ${undefined}               | ${APP_CONTAINER.native}
             ${AppOwnership.Expo}       | ${APP_CONTAINER.expo}
             ${AppOwnership.Standalone} | ${APP_CONTAINER.native}
             ${AppOwnership.Guest}      | ${APP_CONTAINER.native}
