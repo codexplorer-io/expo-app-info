@@ -42,9 +42,10 @@ export const Store = createStore({
     actions: {
         initialize: ({ appContainer } = {}) => async ({ setState }) => {
             const installationId = await getInstallationId();
+            const manifest = Constants.manifest2?.extra?.expoClient ?? Constants.manifest;
             setState({
-                appName: Constants.manifest?.name,
-                appVersion: Constants.manifest?.version,
+                appName: manifest?.name,
+                appVersion: manifest?.version,
                 installationTime: await Application.getInstallationTimeAsync(),
                 installationId,
                 sessionId,
