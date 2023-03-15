@@ -124,7 +124,21 @@ export const setItemAsync = (key, value) => AsyncStorage.setItem(key, value);
 
 export const ALWAYS = null;
 ```
-3. Install `@react-native-async-storage/async-storage` as an app dependency and if using `yarn` add mocked packages as submodules within app `my-app/package.json`:
+3. Mock `expo-application` package:
+- Create package directory as a child of your app, eg. `my-app/src/packages/expo-application`;
+- Create file `my-app/src/packages/expo-application/package.json` with content:
+```json
+{
+    "name": "expo-application",
+    "version": "1.0.0",
+    "main": "src/index.js"
+}
+```
+- Create file `my-app/src/packages/expo-application/src/index.js` with content:
+```javascript
+export const getInstallationTimeAsync = async () => null;
+```
+4. Install `@react-native-async-storage/async-storage` as an app dependency and if using `yarn` add mocked packages as submodules within app `my-app/package.json`:
 ```json
 {
     "workspaces": [
