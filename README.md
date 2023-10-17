@@ -160,6 +160,9 @@ symbol|description|
 useAppInfo|hook used to access app info state and actions|
 useAppInfoActions|hook used to access app info actions|
 APP_CONTAINER|constant used to detect app container (expo - when app container is expo go app; native - when app is running as an standalone native app; web - when app is running as a web app). When app is `expo` or `native` it will be autodetedted, while for `web`, container needs to be passed as an initialization parameter|
+areAppVersionsEqual|util function to compare if current app version (1st argument) is equal to app version (2nd argument). Returns `true` if equal, otherwise `false`.|
+isCurrentAppVersionGreaterThanAppVersion|util function to compare if current app version (1st argument) is greater than app version (2nd argument). Returns `true` if current version is greater, otherwise `false`.|
+isCurrentAppVersionLowerThanAppVersion|util function to compare if current app version (1st argument) is lower than app version (2nd argument). Returns `true` if current version is lower, otherwise `false`.|
 
 ## useAppInfoActions
 Returns an array `[null, { initialize }]`. `initialize` is used for app info initialization and returns resolved promise after app has been initialized

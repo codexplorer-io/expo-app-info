@@ -3,6 +3,8 @@ import Constants, { AppOwnership } from 'expo-constants';
 import * as Application from 'expo-application';
 import * as SecureStore from 'expo-secure-store';
 import { v4 as uuid } from 'uuid';
+import split from 'lodash/split';
+import max from 'lodash/max';
 
 const sessionId = uuid();
 
@@ -45,7 +47,7 @@ export const Store = createStore({
             const manifest = Constants.manifest2?.extra?.expoClient ?? Constants.manifest;
             setState({
                 appName: manifest?.name,
-                appVersion: manifest?.version,
+                appVersion: manifest?.version ?? Constants.expoConfig?.version,
                 installationTime: await Application.getInstallationTimeAsync(),
                 installationId,
                 sessionId,
@@ -63,3 +65,75 @@ export const Store = createStore({
 export const useAppInfo = createHook(Store);
 
 export const useAppInfoActions = createHook(Store, { selector: null });
+
+export const areAppVersionsEqual = (
+    currentAppVersion,
+    appVersion
+) => currentAppVersion === appVersion;
+
+const compareCurrentAppVersionWithAppVersion = (
+    currentAppVersion,
+    appVersion,
+    versionsPartComparator
+) => {
+    const currentAppVersionParts = split(currentAppVersion, '.');
+    const appVersionParts = split(appVersion, '.');
+    const length = max([
+        currentAppVersionParts.length,
+        appVersionParts.length
+    ]);
+
+    for (let i = 0; i < length; i += 1) {
+        const currentAppVersionPart = currentAppVersionParts[i] ?
+            +currentAppVersionParts[i] :
+            0;
+        const appVersionPart = appVersionParts[i] ?
+            +appVersionParts[i] :
+            0;
+
+        const compare = versionsPartComparator(currentAppVersionPart, appVersionPart);
+        if (compare !== undefined) {
+            return compare;
+        }
+    }
+
+    return false;
+};
+
+export const isCurrentAppVersionGreaterThanAppVersion = (
+    currentAppVersion,
+    appVersion
+) => compareCurrentAppVersionWithAppVersion(
+    currentAppVersion,
+    appVersion,
+    (currentAppVersionPart, appVersionPart) => {
+        if (currentAppVersionPart > appVersionPart) {
+            return true;
+        }
+
+        if (currentAppVersionPart < appVersionPart) {
+            return false;
+        }
+
+        return undefined;
+    }
+);
+
+export const isCurrentAppVersionLowerThanAppVersion = (
+    currentAppVersion,
+    appVersion
+) => compareCurrentAppVersionWithAppVersion(
+    currentAppVersion,
+    appVersion,
+    (currentAppVersionPart, appVersionPart) => {
+        if (currentAppVersionPart < appVersionPart) {
+            return true;
+        }
+
+        if (currentAppVersionPart > appVersionPart) {
+            return false;
+        }
+
+        return undefined;
+    }
+);

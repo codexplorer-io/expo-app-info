@@ -10,7 +10,10 @@ import {
     APP_CONTAINER,
     Store,
     useAppInfo,
-    useAppInfoActions
+    useAppInfoActions,
+    areAppVersionsEqual,
+    isCurrentAppVersionGreaterThanAppVersion,
+    isCurrentAppVersionLowerThanAppVersion
 } from './index';
 
 jest.mock('uuid', () => {
@@ -216,6 +219,82 @@ describe('App info', () => {
             expect(
                 await SecureStore.getItemAsync('codexporer.io-expo_app_info-installation_id')
             ).toBe('uuid-1');
+        });
+    });
+
+    describe('App versions comparison', () => {
+        describe('areAppVersionsEqual', () => {
+            it('should return true when comparing same versions', () => {
+                expect(areAppVersionsEqual('1.14.5', '1.14.5')).toBe(true);
+            });
+
+            it('should return false when comparing with higher version', () => {
+                expect(areAppVersionsEqual('1.14.5', '1.14.6')).toBe(false);
+            });
+
+            it('should return false when comparing with lower version', () => {
+                expect(areAppVersionsEqual('1.14.5', '1.14.1')).toBe(false);
+            });
+        });
+
+        describe('isCurrentAppVersionLowerThanAppVersion', () => {
+            it('should return false when comparing same versions', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('1.14.5', '1.14.5')).toBe(false);
+            });
+
+            it('should return true when comparing with higher major version', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('1.14.5', '2.0.0')).toBe(true);
+            });
+
+            it('should return true when comparing with higher minor version', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('1.14.5', '1.16.0')).toBe(true);
+            });
+
+            it('should return true when comparing with higher patch version', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('1.14.5', '1.14.7')).toBe(true);
+            });
+
+            it('should return false when comparing with lower major version', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', '1.20.0')).toBe(false);
+            });
+
+            it('should return false when comparing with lower minor version', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', '2.13.10')).toBe(false);
+            });
+
+            it('should return false when comparing with lower patch version', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', '2.14.4')).toBe(false);
+            });
+        });
+
+        describe('isCurrentAppVersionGreaterThanAppVersion', () => {
+            it('should return false when comparing same versions', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('1.14.5', '1.14.5')).toBe(false);
+            });
+
+            it('should return false when comparing with higher major version', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('1.14.5', '2.0.0')).toBe(false);
+            });
+
+            it('should return false when comparing with higher minor version', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('1.14.5', '1.16.0')).toBe(false);
+            });
+
+            it('should return false when comparing with higher patch version', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('1.14.5', '1.14.7')).toBe(false);
+            });
+
+            it('should return true when comparing with lower major version', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('2.14.5', '1.20.0')).toBe(true);
+            });
+
+            it('should return true when comparing with lower minor version', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('2.14.5', '2.13.10')).toBe(true);
+            });
+
+            it('should return true when comparing with lower patch version', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('2.14.5', '2.14.4')).toBe(true);
+            });
         });
     });
 });
