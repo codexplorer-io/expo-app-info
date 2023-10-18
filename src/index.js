@@ -66,11 +66,6 @@ export const useAppInfo = createHook(Store);
 
 export const useAppInfoActions = createHook(Store, { selector: null });
 
-export const areAppVersionsEqual = (
-    currentAppVersion,
-    appVersion
-) => currentAppVersion === appVersion;
-
 const compareCurrentAppVersionWithAppVersion = (
     currentAppVersion,
     appVersion,
@@ -100,40 +95,75 @@ const compareCurrentAppVersionWithAppVersion = (
     return false;
 };
 
+export const areAppVersionsEqual = (
+    currentAppVersion,
+    appVersion
+) => {
+    if (currentAppVersion == null || appVersion == null) {
+        return false;
+    }
+
+    const result = compareCurrentAppVersionWithAppVersion(
+        currentAppVersion,
+        appVersion,
+        (currentAppVersionPart, appVersionPart) => {
+            if (currentAppVersionPart !== appVersionPart) {
+                return true;
+            }
+
+            return undefined;
+        }
+    );
+
+    return result === false;
+};
+
 export const isCurrentAppVersionGreaterThanAppVersion = (
     currentAppVersion,
     appVersion
-) => compareCurrentAppVersionWithAppVersion(
-    currentAppVersion,
-    appVersion,
-    (currentAppVersionPart, appVersionPart) => {
-        if (currentAppVersionPart > appVersionPart) {
-            return true;
-        }
-
-        if (currentAppVersionPart < appVersionPart) {
-            return false;
-        }
-
-        return undefined;
+) => {
+    if (currentAppVersion == null || appVersion == null) {
+        return false;
     }
-);
+
+    return compareCurrentAppVersionWithAppVersion(
+        currentAppVersion,
+        appVersion,
+        (currentAppVersionPart, appVersionPart) => {
+            if (currentAppVersionPart > appVersionPart) {
+                return true;
+            }
+
+            if (currentAppVersionPart < appVersionPart) {
+                return false;
+            }
+
+            return undefined;
+        }
+    );
+};
 
 export const isCurrentAppVersionLowerThanAppVersion = (
     currentAppVersion,
     appVersion
-) => compareCurrentAppVersionWithAppVersion(
-    currentAppVersion,
-    appVersion,
-    (currentAppVersionPart, appVersionPart) => {
-        if (currentAppVersionPart < appVersionPart) {
-            return true;
-        }
-
-        if (currentAppVersionPart > appVersionPart) {
-            return false;
-        }
-
-        return undefined;
+) => {
+    if (currentAppVersion == null || appVersion == null) {
+        return false;
     }
-);
+
+    return compareCurrentAppVersionWithAppVersion(
+        currentAppVersion,
+        appVersion,
+        (currentAppVersionPart, appVersionPart) => {
+            if (currentAppVersionPart < appVersionPart) {
+                return true;
+            }
+
+            if (currentAppVersionPart > appVersionPart) {
+                return false;
+            }
+
+            return undefined;
+        }
+    );
+};

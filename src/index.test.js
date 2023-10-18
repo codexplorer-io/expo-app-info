@@ -228,12 +228,44 @@ describe('App info', () => {
                 expect(areAppVersionsEqual('1.14.5', '1.14.5')).toBe(true);
             });
 
+            it('should return true when comparing same versions where one is missing part', () => {
+                expect(areAppVersionsEqual('1.14.0', '1.14')).toBe(true);
+            });
+
+            it('should return true when comparing same versions with extra zero digits', () => {
+                expect(areAppVersionsEqual('001.000014.05', '01.014.00005')).toBe(true);
+            });
+
             it('should return false when comparing with higher version', () => {
                 expect(areAppVersionsEqual('1.14.5', '1.14.6')).toBe(false);
             });
 
             it('should return false when comparing with lower version', () => {
                 expect(areAppVersionsEqual('1.14.5', '1.14.1')).toBe(false);
+            });
+
+            it('should return false when comparing undefineds', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion(undefined, undefined)).toBe(false);
+            });
+
+            it('should return false when comparing nulls', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion(null, null)).toBe(false);
+            });
+
+            it('should return false when comparing undefined', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion(undefined, '2.13.10')).toBe(false);
+            });
+
+            it('should return false when comparing null', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion(null, '2.14.4')).toBe(false);
+            });
+
+            it('should return false when comparing with undefined', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', undefined)).toBe(false);
+            });
+
+            it('should return false when comparing with null', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', null)).toBe(false);
             });
         });
 
@@ -265,6 +297,22 @@ describe('App info', () => {
             it('should return false when comparing with lower patch version', () => {
                 expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', '2.14.4')).toBe(false);
             });
+
+            it('should return false when comparing undefined', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion(undefined, '2.13.10')).toBe(false);
+            });
+
+            it('should return false when comparing null', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion(null, '2.14.4')).toBe(false);
+            });
+
+            it('should return false when comparing with undefined', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', undefined)).toBe(false);
+            });
+
+            it('should return false when comparing with null', () => {
+                expect(isCurrentAppVersionLowerThanAppVersion('2.14.5', null)).toBe(false);
+            });
         });
 
         describe('isCurrentAppVersionGreaterThanAppVersion', () => {
@@ -294,6 +342,22 @@ describe('App info', () => {
 
             it('should return true when comparing with lower patch version', () => {
                 expect(isCurrentAppVersionGreaterThanAppVersion('2.14.5', '2.14.4')).toBe(true);
+            });
+
+            it('should return false when comparing undefined', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion(undefined, '2.13.10')).toBe(false);
+            });
+
+            it('should return false when comparing null', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion(null, '2.14.4')).toBe(false);
+            });
+
+            it('should return false when comparing with undefined', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('2.14.5', undefined)).toBe(false);
+            });
+
+            it('should return false when comparing with null', () => {
+                expect(isCurrentAppVersionGreaterThanAppVersion('2.14.5', null)).toBe(false);
             });
         });
     });
