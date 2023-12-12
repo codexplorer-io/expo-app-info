@@ -99,7 +99,8 @@ describe('App info', () => {
                 appName: undefined,
                 appVersion: undefined,
                 installationId: undefined,
-                sessionId: undefined
+                sessionId: 'uuid-0',
+                startTime: expect.any(Date)
             });
         });
 
@@ -119,7 +120,8 @@ describe('App info', () => {
                 appVersion: 'mockAppVersion',
                 installationTime: 'mockInstalationTime',
                 installationId: 'uuid-1',
-                sessionId: 'uuid-0'
+                sessionId: 'uuid-0',
+                startTime: expect.any(Date)
             });
             expect(
                 await SecureStore.getItemAsync('codexporer.io-expo_app_info-installation_id')
@@ -161,7 +163,8 @@ describe('App info', () => {
                 appVersion: 'mockAppVersion',
                 installationTime: 'mockInstalationTime',
                 installationId: 'uuid-1',
-                sessionId: 'uuid-0'
+                sessionId: 'uuid-0',
+                startTime: expect.any(Date)
             });
         });
 

@@ -7,6 +7,7 @@ import split from 'lodash/split';
 import max from 'lodash/max';
 
 const sessionId = uuid();
+const startTime = new Date();
 
 const getInstallationId = async () => {
     const key = 'codexporer.io-expo_app_info-installation_id';
@@ -38,8 +39,9 @@ export const Store = createStore({
         appVersion: undefined,
         installationTime: undefined,
         installationId: undefined,
-        sessionId: undefined,
-        appContainer: undefined
+        appContainer: undefined,
+        sessionId,
+        startTime
     },
     actions: {
         initialize: ({ appContainer } = {}) => async ({ setState }) => {
@@ -50,7 +52,6 @@ export const Store = createStore({
                 appVersion: manifest?.version ?? Constants.expoConfig?.version,
                 installationTime: await Application.getInstallationTimeAsync(),
                 installationId,
-                sessionId,
                 appContainer: appContainer ?? (
                     Constants.appOwnership === AppOwnership.Expo ?
                         APP_CONTAINER.expo :

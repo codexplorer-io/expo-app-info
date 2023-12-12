@@ -64,7 +64,8 @@ export const App = () => {
         appVersion,
         installationId,
         sessionId,
-        appContainer
+        appContainer,
+        startTime
     }] = useAppInfo();
     ...
     
@@ -178,3 +179,4 @@ appVersion|current version of the app|
 installationId|an identifier that is unique to this particular device and whose lifetime is at least as long as the installation of the app|
 sessionId|a string that is unique to the current session of your app. It is different across apps and across multiple launches of the same app|
 appContainer|context in which app is running (expo, native or web)|
+startTime|Date when app was started|
