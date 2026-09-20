@@ -9,7 +9,6 @@
     "expo-constants": "*",
     "expo-secure-store": "*",
     "uuid": "*",
-    "lodash": "*",
-    "@codexporer.io/react-test-utils": "*"
+    "lodash": "*"
   }
 }
