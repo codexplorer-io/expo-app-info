@@ -1,182 +1,117 @@
-# expo-app-info
-App info hook react-native, expo and react.
+# `@codexporer.io/expo-app-info`
+
+Application runtime metadata and lifecycle store for React Native, Expo, and React Web. Provides persistent installation ID (via `expo-secure-store` / keychain), ephemeral session ID, runtime container detection, and semver comparison utilities backed by `react-sweet-state`.
 
 ## Platform Compatibility
-iOS|Android|Web|
--|-|-|
-✅|✅|✅|
 
-## Usage
-Before using the app info, it needs to be initalized within the root component:
-```javascript
-// index.js
+| iOS | Android | Web |
+| :---: | :---: | :---: |
+| ✅ | ✅ | ✅ |
 
+## Installation & Peer Dependencies
+
+```bash
+yarn add @codexporer.io/expo-app-info
+```
+
+Peer dependencies:
+- `react` (`*`)
+- `react-native` (`*`)
+- `react-sweet-state` (`*`)
+- `expo-constants` (`*`)
+- `expo-application` (`*`)
+- `expo-secure-store` (`*`)
+- `uuid` (`*`)
+- `lodash` (`*`)
+
+## Quick Start
+
+### 1. Initialize During App Bootstrap
+
+Call `initialize` once at application startup before rendering screens that depend on app metadata:
+
+```tsx
+import React, { useState, useEffect } from 'react';
+import { ActivityIndicator } from 'react-native';
 import { useAppInfoActions, APP_CONTAINER } from '@codexporer.io/expo-app-info';
-import { App } from './app';
-...
 
-const AppRoot = () => {
-    const [isInitialized, setIsInitialized] = useState(false);
-    const [, { initialize: initializeAppInfo }] = useAppInfoActions();
-    
-    useEffect(() => {
-        if (isInitialized) {
-            return;
-        }
+export const AppRoot = ({ children }: { children: React.ReactNode }) => {
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [, { initialize: initializeAppInfo }] = useAppInfoActions();
 
-        initializeAppInfo({ appContainer: APP_CONTAINER.web }).then(
-            () => setIsInitialized(true)
-        );
-    }, [
-        initializeAppInfo,
-        isInitialized,
-        setIsInitialized
-    ]);
-    ...
-    
-    if (!isInitialized) {
-        return null;
-    }
-    
-    return (
-        <App />
-    );
-};
+  useEffect(() => {
+    initializeAppInfo().then(() => setIsInitialized(true));
+  }, [initializeAppInfo]);
 
-ReactDOM.render(
-    <React.StrictMode>
-        <AppRoot />
-    </React.StrictMode>,
-    document.getElementById('root')
-);
-```
+  if (!isInitialized) {
+    return <ActivityIndicator size="large" />;
+  }
 
-After initialization, app info can be used anywhere whithin the descendants:
-```javascript
-// app.js
-
-import { useAppInfo } from '@codexporer.io/expo-app-info';
-...
-
-export const App = () => {
-    const [{
-        appName,
-        appVersion,
-        installationId,
-        sessionId,
-        appContainer,
-        startTime
-    }] = useAppInfo();
-    ...
-    
-    return (
-        ...
-    );
+  return <>{children}</>;
 };
 ```
 
-## Web support
-Hook is supported within react native & expo out of the box. To add web support some modules needs to be mocked, if already not. Steps to mock modules:
-1. Mock `expo-constants` package:
-- Create package directory as a child of your app, eg. `my-app/src/packages/expo-constants`;
-- Create file `my-app/src/packages/expo-constants/package.json` with content:
-```json
-{
-    "name": "expo-constants",
-    "version": "1.0.0",
-    "main": "src/index.js"
-}
-```
-- Create file `my-app/src/packages/expo-constants/src/index.js` with content:
-```javascript
-const constants = {
-    manifest: {
-        name: 'App Name',
-        version: 'X.Y.Z'
-    },
-    appOwnership: null
+### 2. Access App Information Anywhere in Descendants
+
+```tsx
+import React from 'react';
+import { View, Text } from 'react-native';
+import {
+  useAppInfo,
+  isCurrentAppVersionGreaterThanAppVersion
+} from '@codexporer.io/expo-app-info';
+
+export const AppVersionWidget = () => {
+  const [appInfo] = useAppInfo();
+
+  const isUpgrade = isCurrentAppVersionGreaterThanAppVersion(
+    appInfo.appVersion ?? '1.0.0',
+    '1.2.0'
+  );
+
+  return (
+    <View style={{ padding: 16 }}>
+      <Text>App: {appInfo.appName} (v{appInfo.appVersion})</Text>
+      <Text>Install ID: {appInfo.installationId}</Text>
+      <Text>Session ID: {appInfo.sessionId}</Text>
+      <Text>Runtime: {appInfo.appContainer}</Text>
+      {isUpgrade && <Text>New features enabled!</Text>}
+    </View>
+  );
 };
-
-export const AppOwnership = {
-    Standalone: 'standalone',
-    Expo: 'expo',
-    Guest: 'guest'
-};
-
-export default constants;
 ```
-2. Mock `expo-secure-store` package:
-- Create package directory as a child of your app, eg. `my-app/src/packages/expo-secure-store`;
-- Create file `my-app/src/packages/expo-secure-store/package.json` with content:
-```json
-{
-    "name": "expo-secure-store",
-    "version": "1.0.0",
-    "main": "src/index.js"
-}
-```
-- Create file `my-app/src/packages/expo-secure-store/src/index.js` with content:
-```javascript
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const getItemAsync = key => AsyncStorage.getItem(key);
+## API Reference
 
-export const setItemAsync = (key, value) => AsyncStorage.setItem(key, value);
+### Key Exports
 
-export const ALWAYS = null;
-```
-3. Mock `expo-application` package:
-- Create package directory as a child of your app, eg. `my-app/src/packages/expo-application`;
-- Create file `my-app/src/packages/expo-application/package.json` with content:
-```json
-{
-    "name": "expo-application",
-    "version": "1.0.0",
-    "main": "src/index.js"
-}
-```
-- Create file `my-app/src/packages/expo-application/src/index.js` with content:
-```javascript
-export const getInstallationTimeAsync = async () => null;
-```
-4. Install `@react-native-async-storage/async-storage` as an app dependency and if using `yarn` add mocked packages as submodules within app `my-app/package.json`:
-```json
-{
-    "workspaces": [
-      "src/packages/*",
-      ...
-    ],
-    "dependencies": {
-        "@react-native-async-storage/async-storage": ...,
-        ...
-    },
-    ...
-}
-```
-If not using `yarn`, use your preferred method to install mocked modules as app dependencies.
+| Symbol | Type | Description |
+| :--- | :--- | :--- |
+| `useAppInfo` | `() => [AppInfoState, AppInfoActions]` | Hook used to access app info state and actions |
+| `useAppInfoActions` | `() => [null, AppInfoActions]` | Hook returning actions object without subscribing to state updates |
+| `APP_CONTAINER` | `object` | Container constants: `{ expo: 'expo', native: 'native', web: 'web' }` |
+| `areAppVersionsEqual` | `(v1: string, v2: string) => boolean` | Utility checking if semantic version `v1` equals `v2` |
+| `isCurrentAppVersionGreaterThanAppVersion` | `(current: string, target: string) => boolean` | Utility checking if `current` version is higher than `target` |
+| `isCurrentAppVersionLowerThanAppVersion` | `(current: string, target: string) => boolean` | Utility checking if `current` version is lower than `target` |
 
-## Exports
-symbol|description|
--|-|
-useAppInfo|hook used to access app info state and actions|
-useAppInfoActions|hook used to access app info actions|
-APP_CONTAINER|constant used to detect app container (expo - when app container is expo go app; native - when app is running as an standalone native app; web - when app is running as a web app). When app is `expo` or `native` it will be autodetedted, while for `web`, container needs to be passed as an initialization parameter|
-areAppVersionsEqual|util function to compare if current app version (1st argument) is equal to app version (2nd argument). Returns `true` if equal, otherwise `false`.|
-isCurrentAppVersionGreaterThanAppVersion|util function to compare if current app version (1st argument) is greater than app version (2nd argument). Returns `true` if current version is greater, otherwise `false`.|
-isCurrentAppVersionLowerThanAppVersion|util function to compare if current app version (1st argument) is lower than app version (2nd argument). Returns `true` if current version is lower, otherwise `false`.|
+### `AppInfoState` Fields
 
-## useAppInfoActions
-Returns an array `[null, { initialize }]`. `initialize` is used for app info initialization and returns resolved promise after app has been initialized
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `appName` | `string \| undefined` | Name of the app extracted from manifest |
+| `appVersion` | `string \| undefined` | Version string of the app (e.g. `'1.4.2'`) |
+| `installationId` | `string \| undefined` | Persistent UUID stored in SecureStore / keychain surviving app restarts |
+| `installationTime` | `Date \| undefined` | Initial application install timestamp |
+| `sessionId` | `string` | Ephemeral UUID generated in memory for the active app session |
+| `appContainer` | `'expo' \| 'native' \| 'web'` | Runtime context (`expo` for Expo Go, `native` for standalone app, `web` for browser) |
+| `startTime` | `Date` | Timestamp recording when the current session began |
 
-## useAppInfo
-Returns an array `[{ ...state }, { initialize }]`. `initialize` is used for app info initialization and returns resolved promise after app has been initialized
+### `AppInfoActions`
 
-### State
-option|description|
--|-|
-appName|name of the app|
-appVersion|current version of the app|
-installationId|an identifier that is unique to this particular device and whose lifetime is at least as long as the installation of the app|
-sessionId|a string that is unique to the current session of your app. It is different across apps and across multiple launches of the same app|
-appContainer|context in which app is running (expo, native or web)|
-startTime|Date when app was started|
+| Action | Signature | Description |
+| :--- | :--- | :--- |
+| `initialize` | `(options?: { appContainer?: string }) => Promise<void>` | Reads app manifest, retrieves or generates persistent UUID, and commits state |
+
+## License
+
+MIT
