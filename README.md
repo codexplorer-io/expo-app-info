@@ -1,28 +1,29 @@
 # `@codexporer.io/expo-app-info`
 
-Application runtime metadata and lifecycle store for React Native, Expo, and React Web. Provides persistent installation ID (via `expo-secure-store` / keychain), ephemeral session ID, runtime container detection, and semver comparison utilities backed by `react-sweet-state`.
+Application runtime metadata and lifecycle store for Expo and React Native. Backed by `react-sweet-state`, `expo-constants`, `expo-application`, and `expo-secure-store`.
 
-## Platform Compatibility
+---
 
-| iOS | Android | Web |
-| :---: | :---: | :---: |
-| ✅ | ✅ | ✅ |
+## Peer Dependencies
 
-## Installation & Peer Dependencies
-
-```bash
-yarn add @codexporer.io/expo-app-info
-```
-
-Peer dependencies:
+All of the following peer dependencies must be installed in the consuming project:
 - `react` (`*`)
-- `react-native` (`*`)
 - `react-sweet-state` (`*`)
 - `expo-constants` (`*`)
 - `expo-application` (`*`)
 - `expo-secure-store` (`*`)
 - `uuid` (`*`)
 - `lodash` (`*`)
+
+---
+
+## Installation
+
+```bash
+yarn add @codexporer.io/expo-app-info
+```
+
+---
 
 ## Quick Start
 
@@ -33,7 +34,7 @@ Call `initialize` once at application startup before rendering screens that depe
 ```tsx
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
-import { useAppInfoActions, APP_CONTAINER } from '@codexporer.io/expo-app-info';
+import { useAppInfoActions } from '@codexporer.io/expo-app-info';
 
 export const AppRoot = ({ children }: { children: React.ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -81,36 +82,41 @@ export const AppVersionWidget = () => {
 };
 ```
 
+---
+
 ## API Reference
 
 ### Key Exports
 
 | Symbol | Type | Description |
 | :--- | :--- | :--- |
+| `Store` | `StoreModel` | Raw `react-sweet-state` store object named `'AppInfo'` |
 | `useAppInfo` | `() => [AppInfoState, AppInfoActions]` | Hook used to access app info state and actions |
-| `useAppInfoActions` | `() => [null, AppInfoActions]` | Hook returning actions object without subscribing to state updates |
+| `useAppInfoActions` | `() => [null, AppInfoActions]` | Hook returning actions without subscribing to state changes |
 | `APP_CONTAINER` | `object` | Container constants: `{ expo: 'expo', native: 'native', web: 'web' }` |
-| `areAppVersionsEqual` | `(v1: string, v2: string) => boolean` | Utility checking if semantic version `v1` equals `v2` |
-| `isCurrentAppVersionGreaterThanAppVersion` | `(current: string, target: string) => boolean` | Utility checking if `current` version is higher than `target` |
-| `isCurrentAppVersionLowerThanAppVersion` | `(current: string, target: string) => boolean` | Utility checking if `current` version is lower than `target` |
+| `areAppVersionsEqual` | `(v1: string, v2: string) => boolean` | Utility checking if semantic version `v1` equals `v2` (returns `false` if either is `null` or `undefined`) |
+| `isCurrentAppVersionGreaterThanAppVersion` | `(current: string, target: string) => boolean` | Utility checking if `current` version is higher than `target` (returns `false` if either is `null` or `undefined`) |
+| `isCurrentAppVersionLowerThanAppVersion` | `(current: string, target: string) => boolean` | Utility checking if `current` version is lower than `target` (returns `false` if either is `null` or `undefined`) |
 
 ### `AppInfoState` Fields
 
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `appName` | `string \| undefined` | Name of the app extracted from manifest |
-| `appVersion` | `string \| undefined` | Version string of the app (e.g. `'1.4.2'`) |
-| `installationId` | `string \| undefined` | Persistent UUID stored in SecureStore / keychain surviving app restarts |
-| `installationTime` | `Date \| undefined` | Initial application install timestamp |
-| `sessionId` | `string` | Ephemeral UUID generated in memory for the active app session |
-| `appContainer` | `'expo' \| 'native' \| 'web'` | Runtime context (`expo` for Expo Go, `native` for standalone app, `web` for browser) |
-| `startTime` | `Date` | Timestamp recording when the current session began |
+| Property | Initial Value | Populated Value on `initialize()` | Description |
+| :--- | :--- | :--- | :--- |
+| `appName` | `undefined` | `manifest?.name` | Extracted from `Constants.manifest2?.extra?.expoClient ?? Constants.manifest` |
+| `appVersion` | `undefined` | `manifest?.version ?? Constants.expoConfig?.version` | Extracted from manifest or `Constants.expoConfig` |
+| `installationId` | `undefined` | `string` (UUID v4) | Persisted in `SecureStore` under `'codexporer.io-expo_app_info-installation_id'` with `keychainAccessible: SecureStore.ALWAYS` |
+| `installationTime` | `undefined` | `Date` | Returned by `Application.getInstallationTimeAsync()` |
+| `appContainer` | `undefined` | `'expo' \| 'native' \| 'web'` | Passed via `initialize({ appContainer })` or defaults to `'expo'` if `Constants.appOwnership === AppOwnership.Expo`, else `'native'` |
+| `sessionId` | `string` | Preserved from module load | Ephemeral UUID v4 generated once at module import |
+| `startTime` | `Date` | Preserved from module load | `new Date()` timestamp created once at module import |
 
 ### `AppInfoActions`
 
 | Action | Signature | Description |
 | :--- | :--- | :--- |
-| `initialize` | `(options?: { appContainer?: string }) => Promise<void>` | Reads app manifest, retrieves or generates persistent UUID, and commits state |
+| `initialize` | `(options?: { appContainer?: string }) => Promise<void>` | Reads app manifest, retrieves or generates persistent UUID, gets installation time, and commits state |
+
+---
 
 ## License
 

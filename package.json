@@ -4,9 +4,9 @@
   "main": "src/index.js",
   "peerDependencies": {
     "react": "*",
-    "react-dom": "*",
     "react-sweet-state": "*",
     "expo-constants": "*",
+    "expo-application": "*",
     "expo-secure-store": "*",
     "uuid": "*",
     "lodash": "*"
